@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:syncfusion="clr-namespace:Syncfusion.Maui.DataGrid;assembly=Syncfusion.Maui.DataGrid"
+             xmlns:local="clr-namespace:DataGridMAUI"
+             xmlns:core="clr-namespace:Syncfusion.Maui.Core;assembly=Syncfusion.Maui.Core"
+             xmlns:popup="clr-namespace:Syncfusion.Maui.Popup;assembly=Syncfusion.Maui.Popup"
+             xmlns:listView="clr-namespace:Syncfusion.Maui.ListView;assembly=Syncfusion.Maui.ListView"
+             xmlns:buttons="clr-namespace:Syncfusion.Maui.Buttons;assembly=Syncfusion.Maui.Buttons"
+             xmlns:editors="clr-namespace:Syncfusion.Maui.Inputs;assembly=Syncfusion.Maui.Inputs"             
+             x:Class="DataGridMAUI.EmployeeOnboardingPage"             
+             Title="Employee Onboarding Tracker">
+
+    <ContentPage.Resources>
+        <OnPlatform x:Key="searchBoxHeight" x:TypeArguments="x:Double">
+            <On Platform="Android,iOS" Value="29"></On>
+            <On Platform="WinUI,MacCatalyst" Value="36"></On>
+        </OnPlatform>
+
+        <ResourceDictionary>
+            
+            <Style TargetType="popup:SfPopup">
+                <Setter Property="ShowFooter" Value="False"/>
+                <Setter Property="ShowHeader" Value="False"/>
+                <Setter Property="ShowOverlayAlways" Value="False"/>
+                <Setter Property="RelativePosition" Value="AlignBottomRight"/>
+                <Setter Property="PopupStyle">
+                    <popup:PopupStyle CornerRadius="10" Stroke="LightGray" MessageBackground="White" StrokeThickness="1" HasShadow="True"/>
+                </Setter>
+            </Style>
+
+            <Style TargetType="core:SfChip">
+                <Setter Property="StrokeThickness" Value="0"/>
+            </Style>
+        </ResourceDictionary>
+    </ContentPage.Resources>
+
+    <ContentPage.BindingContext>
+        <local:EmployeeOnboardingViewModel />
+    </ContentPage.BindingContext>
+
+    <Grid Padding="10" RowDefinitions="Auto, *">
+
+        <StackLayout Margin="5" Spacing="10" Orientation="Horizontal" HeightRequest="40">
+
+            <core:SfChip Text="Hide columns" VerticalOptions="Center" x:Name="HideColumns" Command="{Binding HideColumns}"/>
+            <popup:SfPopup IsOpen="{Binding IsOpenForHideColumns}" RelativeView="{x:Reference HideColumns}" AutoSizeMode="Height">
+                <popup:SfPopup.ContentTemplate>
+                    <DataTemplate>
+                        <listView:SfListView ItemsSource="{Binding GridColumns}" IsStickyHeader="True" IsStickyFooter="True" FooterSize="50">
+                            <listView:SfListView.ItemTemplate>
+                                <DataTemplate>
+                                    <buttons:SfCheckBox IsChecked="{Binding IsChecked}" Text="{Binding DisplayName}"/>
+                                </DataTemplate>
+                            </listView:SfListView.ItemTemplate>
+                            <listView:SfListView.FooterTemplate>
+                                <DataTemplate>
+                                    <Grid ColumnDefinitions="*,*" Margin="5">
+                                        <Button Text="Hide All" TextColor="{StaticResource Primary}" Background="Transparent" HorizontalOptions="Start" Command="{Binding HideAllColumns}" CornerRadius="0"/>
+                                        <Button Text="Show All" TextColor="{StaticResource Primary}" Background="Transparent" HorizontalOptions="End" Grid.Column="1" Command="{Binding ShowAllColumns}" CornerRadius="0"/>
+                                    </Grid>
+                                </DataTemplate>
+                            </listView:SfListView.FooterTemplate>
+                        </listView:SfListView>
+                    </DataTemplate>
+                </popup:SfPopup.ContentTemplate>
+            </popup:SfPopup>
+
+            <core:SfChip  Text="Filter" VerticalOptions="Center" x:Name="Filter" Command="{Binding FilterColumns}"/>
+            <popup:SfPopup HeightRequest="60" AutoSizeMode="Width" RelativeView="{x:Reference Filter}" IsOpen="{Binding IsOpenForFilterColumns}">
+                <popup:SfPopup.ContentTemplate>
+                    <DataTemplate>
+                        <HorizontalStackLayout Spacing="20" Margin="10">
+                            <Label Text="&#xe755;"  FontFamily="MauiSampleFontIcon" VerticalOptions="Center">
+                                <Label.GestureRecognizers>
+                                    <TapGestureRecognizer Command="{Binding ClearFilter}"/>
+                                </Label.GestureRecognizers>
+                            </Label>
+                            <editors:SfComboBox ItemsSource="{Binding SearchConditions}" SelectedItem="{Binding SelectedCondition}" IsClearButtonVisible="False"/>
+                            <editors:SfComboBox ItemsSource="{Binding GridColumnsForFilter}" DisplayMemberPath="DisplayName"  SelectedItem="{Binding SelectedColumn}" IsClearButtonVisible="False">
+                                <editors:SfComboBox.ItemTemplate>
+                                    <DataTemplate>
+                                        <Label Text="{Binding DisplayName}"/>
+                                    </DataTemplate>
+                                </editors:SfComboBox.ItemTemplate>
+                            </editors:SfComboBox>
+
+                            <Border StrokeThickness="1" VerticalOptions="Center"
+                                BackgroundColor="White"
+                                HeightRequest="38"                                
+                                StrokeShape="RoundRectangle 8">
+                                <Grid ColumnDefinitions="Auto,*"
+                                      Margin="0,0,8,0">
+                                    <Label Text="&#xe728;"
+                                          FontFamily="MauiSampleFontIcon"
+                                          VerticalOptions="Center"
+                                          HorizontalOptions="Center"
+                                          FontSize="16"
+                                          Margin="10,0,12,0" />
+                                    <local:SfEntry  x:Name="filterText"
+                                                    Text="{Binding FilterText}"
+                                                   Grid.Column="1"                                                     
+                                                   BackgroundColor="Transparent"                                                                                                  
+                                                    HorizontalOptions="{OnPlatform Android='StartAndExpand',WinUI='End',MacCatalyst='End',iOS='FillAndExpand'}"
+                                                   VerticalTextAlignment="{OnPlatform Default=Start, MacCatalyst=Center, iOS=Center}"
+                                                   FontFamily="Roboto-Regular"
+                                                   FontSize="16"
+                                                   ClearButtonVisibility="Never" />
+                                </Grid>
+                            </Border>
+
+                        </HorizontalStackLayout>
+                    </DataTemplate>
+                </popup:SfPopup.ContentTemplate>
+            </popup:SfPopup>
+
+            <core:SfChip  Text="Group" VerticalOptions="Center" x:Name="Group" Command="{Binding GroupColumns}"/>
+            <popup:SfPopup IsOpen="{Binding IsOpenForGroupColumns}"  HeightRequest="60" RelativeView="{x:Reference Group}" AutoSizeMode="Width">
+                <popup:SfPopup.ContentTemplate>
+                    <DataTemplate>
+                        <HorizontalStackLayout Spacing="20" Margin="10">
+                            <Label Text="&#xe755;"  FontFamily="MauiSampleFontIcon" VerticalOptions="Center">
+                                <Label.GestureRecognizers>
+                                    <TapGestureRecognizer Command="{Binding ClearGroup}"/>
+                                </Label.GestureRecognizers>
+                            </Label>
+                            <editors:SfComboBox ItemsSource="{Binding GridColumnsForGroup}" DisplayMemberPath="DisplayName" SelectedItem="{Binding SelectedGroupColumn}" IsClearButtonVisible="False">
+                                <editors:SfComboBox.ItemTemplate>
+                                    <DataTemplate>
+                                        <Label Text="{Binding DisplayName}"/>
+                                    </DataTemplate>
+                                </editors:SfComboBox.ItemTemplate>
+                            </editors:SfComboBox>
+
+                        </HorizontalStackLayout>
+                    </DataTemplate>
+                </popup:SfPopup.ContentTemplate>
+            </popup:SfPopup>
+
+            <core:SfChip  Text="Sort" VerticalOptions="Center" x:Name="Sort" Command="{Binding SortColumns}"/>
+            <popup:SfPopup IsOpen="{Binding IsOpenForSortColumns}"  HeightRequest="60" RelativeView="{x:Reference Sort}" AutoSizeMode="Width">
+                <popup:SfPopup.ContentTemplate>
+                    <DataTemplate>
+                        <HorizontalStackLayout Spacing="20" Margin="10">
+                            <Label Text="&#xe755;"  FontFamily="MauiSampleFontIcon" VerticalOptions="Center">
+                                <Label.GestureRecognizers>
+                                    <TapGestureRecognizer Command="{Binding ClearSort}"/>
+                                </Label.GestureRecognizers>
+                            </Label>
+                            <editors:SfComboBox ItemsSource="{Binding GridColumnsForSort}" DisplayMemberPath="DisplayName" SelectedItem="{Binding SelectedSortColumn}" IsClearButtonVisible="False">
+                                <editors:SfComboBox.ItemTemplate>
+                                    <DataTemplate>
+                                        <Label Text="{Binding DisplayName}"/>
+                                    </DataTemplate>
+                                </editors:SfComboBox.ItemTemplate>
+                            </editors:SfComboBox>
+                            <Label Text="DESC" VerticalOptions="Center"/>
+                            <buttons:SfSwitch IsOn="{Binding IsOnState}" VerticalOptions="Center" />
+                            <Label Text="ASC" VerticalOptions="Center" />
+                        </HorizontalStackLayout>
+                    </DataTemplate>
+                </popup:SfPopup.ContentTemplate>
+            </popup:SfPopup>
+        </StackLayout>
+
+        <syncfusion:SfDataGrid x:Name="dataGrid"    
+                             SortColumnDescriptions="{Binding SortColumnDescriptions}"
+                             GroupColumnDescriptions="{Binding GroupColumnDescriptions}"
+                             AutoGenerateColumnsMode="None"
+                             Columns="{Binding Columns}"
+                             FrozenColumnCount="1"                                            
+                             Grid.Row="1"
+                             AllowAsyncScrolling="True"
+                             SelectionMode="Multiple"
+                             SelectedRows="{Binding SelectedItems}"
+                             ItemsSource="{Binding Employees}">
+            <syncfusion:SfDataGrid.Behaviors>
+                <local:DataGridBehavior/>
+            </syncfusion:SfDataGrid.Behaviors>
+        </syncfusion:SfDataGrid>
+    </Grid>
+</ContentPage>
